@@ -146,7 +146,7 @@ streamlit run app.py
 
 ## 👩‍💻 Author
 
-**Shivasri Munny**  
+**Shivasri**  
 Department of AI & ML  
 Nalla Malla Reddy Engineering College  
 
@@ -155,6 +155,7 @@ Nalla Malla Reddy Engineering College
 ## 📄 License
 
 This project is developed for academic and research purposes.
+
 
 
 
