@@ -1,0 +1,58 @@
+[
+  {
+    "Date": "2026-01-04",
+    "Subject": "math",
+    "Topic": "algebra",
+    "Task Type": "Concept Learning",
+    "Duration (hrs)": 2,
+    "Status": "Pending"
+  },
+  {
+    "Date": "2026-01-05",
+    "Subject": "math",
+    "Topic": "probability",
+    "Task Type": "Concept Learning",
+    "Duration (hrs)": 2,
+    "Status": "Pending"
+  },
+  {
+    "Date": "2026-01-06",
+    "Subject": "math",
+    "Topic": "mean",
+    "Task Type": "Concept Learning",
+    "Duration (hrs)": 2,
+    "Status": "Pending"
+  },
+  {
+    "Date": "2026-01-07",
+    "Subject": "math",
+    "Topic": "median",
+    "Task Type": "Concept Learning",
+    "Duration (hrs)": 2,
+    "Status": "Pending"
+  },
+  {
+    "Date": "2026-01-08",
+    "Subject": "math",
+    "Topic": "Revision / Practice",
+    "Task Type": "Revision",
+    "Duration (hrs)": 2,
+    "Status": "Pending"
+  },
+  {
+    "Date": "2026-01-09",
+    "Subject": "math",
+    "Topic": "Revision / Practice",
+    "Task Type": "Revision",
+    "Duration (hrs)": 2,
+    "Status": "Pending"
+  },
+  {
+    "Date": "2026-01-10",
+    "Subject": "math",
+    "Topic": "Revision / Practice",
+    "Task Type": "Revision",
+    "Duration (hrs)": 2,
+    "Status": "Pending"
+  }
+]
