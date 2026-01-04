@@ -99,4 +99,62 @@ These agents support productivity, communication, and performance analysis.
 ---
 
 ## 📂 Project Structure
+FlowBridge/
+│
+├── agents/ # All AI agent modules
+├── ui/ # UI components (agent selector)
+├── data/ # Local JSON storage
+├── rag/ # RAG-related utilities
+├── utils/ # Helper functions
+├── app.py # Main application entry point
+├── requirements.txt # Dependencies
+└── README.md # Project documentation
+
+
+---
+
+## ▶️ How to Run the Project
+
+1. Clone the repository:
+git clone https://github.com/Shivasri137/FlowBridgee.git
+2. Navigate to the project directory:
+cd FlowBridgee
+3. Install dependencies:
+pip install -r requirements.txt
+4. Run the application:
+streamlit run app.py
+
+---
+
+## 🎯 Key Highlights
+
+- Fully offline & cost-free AI approach  
+- Modular and extensible agent design  
+- Real-time progress tracking and visualization  
+- Suitable for academic evaluation and research papers  
+
+---
+
+## 📌 Future Enhancements
+
+- Calendar integration
+- User authentication
+- Cloud deployment
+- Advanced analytics and recommendations
+
+---
+
+## 👩‍💻 Author
+
+**Shivasri Munny**  
+Department of AI & ML  
+Nalla Malla Reddy Engineering College  
+
+---
+
+## 📄 License
+
+This project is developed for academic and research purposes.
+
+
 
