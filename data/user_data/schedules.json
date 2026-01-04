@@ -2,7 +2,7 @@
   {
     "Date": "2026-01-04",
     "Subject": "math",
-    "Topic": "algebra",
+    "Topic": "probability",
     "Task Type": "Concept Learning",
     "Duration (hrs)": 2,
     "Status": "Pending"
@@ -10,7 +10,7 @@
   {
     "Date": "2026-01-05",
     "Subject": "math",
-    "Topic": "probability",
+    "Topic": "Statistics",
     "Task Type": "Concept Learning",
     "Duration (hrs)": 2,
     "Status": "Pending"
@@ -49,6 +49,14 @@
   },
   {
     "Date": "2026-01-10",
+    "Subject": "math",
+    "Topic": "Revision / Practice",
+    "Task Type": "Revision",
+    "Duration (hrs)": 2,
+    "Status": "Pending"
+  },
+  {
+    "Date": "2026-01-11",
     "Subject": "math",
     "Topic": "Revision / Practice",
     "Task Type": "Revision",
