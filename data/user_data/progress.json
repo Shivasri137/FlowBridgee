@@ -1,8 +1,36 @@
 {
   "math": {
+    "algebra": "Pending",
     "probability": "Pending",
+    "permutattions": "Pending",
+    "Data ware housing": "Completed",
+    "data types": "Pending"
+  },
+  "A I": {
+    "Hill climbing": "Pending",
+    "DFS": "Pending",
+    "BFS": "Pending",
+    "Algorithms": "Pending"
+  },
+  "Maths": {
     "Statistics": "Pending",
-    "mean": "Pending",
-    "median": "Pending"
+    "probability": "Pending",
+    "permutations and combinations": "Pending",
+    "Mean": "Pending",
+    "median": "Pending",
+    "mode": "Pending"
+  },
+  "python ": {
+    "libraries": "Pending"
+  },
+  "python": {
+    "libraries": "Pending"
+  },
+  "Data anayltics": {
+    "Data ware housing": "Pending",
+    "data types": "Pending",
+    "types if data": "Pending",
+    "data cleaning": "Pending",
+    "data preprocessing": "Pending"
   }
 }

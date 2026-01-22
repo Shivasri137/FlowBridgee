@@ -1,122 +1,93 @@
 import streamlit as st
 import json
-from datetime import date
+import os
+import pandas as pd
 import matplotlib.pyplot as plt
+import requests
+from datetime import date
 
+# File Paths
+SCHEDULES_PATH = "data/user_data/schedules.json"
 PROGRESS_PATH = "data/user_data/progress.json"
 
-
-def load_progress():
+def get_phi3_guidance(completed, pending, days_left):
+    url = "http://localhost:11434/api/generate"
+    prompt = f"Student progress: {completed} done, {pending} left, {days_left} days to exam. Give 2 lines of strategy."
     try:
-        with open(PROGRESS_PATH, "r") as f:
-            content = f.read().strip()
-            if not content:
-                return {}
-            return json.loads(content)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+        response = requests.post(url, json={"model": "phi3", "prompt": prompt, "stream": False}, timeout=5)
+        return response.json().get("response", "Stay focused!")
+    except:
+        return "Keep consistent! Every topic completed is a step toward success."
 
+def load_data(path):
+    if os.path.exists(path):
+        try:
+            with open(path, "r") as f:
+                return json.load(f)
+        except:
+            return None
+    return None
 
 def run():
-    st.subheader("Mentor Agent (Guidance, Reminders & Progress Tracking)")
+    st.subheader(" AI Mentor & Progress Insight")
 
-    st.write(
-        "This mentor guides your preparation, reminds pending syllabus topics, "
-        "and visually tracks your progress."
-    )
+    schedule = load_data(SCHEDULES_PATH)
+    if not schedule:
+        st.info("No study data found. Please generate a plan in the **Exam Planner** first.")
+        return
 
-    exam_date = st.date_input("Exam Date", min_value=date.today())
+    # --- 1. CALCULATE STATS ---
+    total_topics = len(schedule)
+    completed_topics = sum(1 for t in schedule if t.get("Status") == "Completed")
+    pending_topics = total_topics - completed_topics
+    
+    # Get exam date safely
+    try:
+        exam_date = date.fromisoformat(schedule[-1]["Date"])
+        days_to_exam = (exam_date - date.today()).days
+    except:
+        days_to_exam = 0
 
-    confidence = st.selectbox(
-        "How confident do you feel?",
-        ["Very low", "Low", "Moderate", "High"]
-    )
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Done", f"{completed_topics}")
+    col2.metric("Pending", f"{pending_topics}")
+    col3.metric("Days Left", f"{max(0, days_to_exam)}")
 
-    if st.button("Get Mentor Advice"):
-        days_left = (exam_date - date.today()).days
+    # --- 2. AI ADVICE ---
+    st.divider()
+    with st.chat_message("assistant"):
+        advice = get_phi3_guidance(completed_topics, pending_topics, days_to_exam)
+        st.write(advice)
 
-        # ---------------- Motivation ----------------
-        st.subheader("Mentor Feedback")
+    # --- 3. VISUAL INSIGHTS ---
+    
+    fig, ax = plt.subplots(1, 2, figsize=(10, 4))
+    
+    # Pie Chart
+    ax[0].pie([completed_topics, max(0.1, pending_topics)], 
+              labels=['Done', 'Pending'], 
+              autopct='%1.1f%%', 
+              colors=['#2ecc71', '#e74c3c'])
+    ax[0].set_title("Completion Rate")
 
-        if days_left > 30:
-            st.info("You have enough time. Focus on consistency and concept clarity.")
-        elif 10 < days_left <= 30:
-            st.warning("Time is limited. Prioritize pending topics and revision.")
-        else:
-            st.error("Exam is very near. Focus on revision and weak areas only.")
+    # Bar Chart
+    ax[1].bar(["Total", "Pending"], [total_topics, pending_topics], color=['#3498db', '#f1c40f'])
+    ax[1].set_title("Workload Volume")
+    st.pyplot(fig)
 
-        if confidence in ["Very low", "Low"]:
-            st.info("Low confidence is normal. Progress comes from completing pending topics.")
-        else:
-            st.success("Your confidence level is good. Maintain momentum.")
-
-        # ---------------- Progress Analysis ----------------
-        st.divider()
-        st.subheader("Syllabus Progress Overview")
-
-        progress = load_progress()
-
-        completed = 0
-        pending = 0
-        pending_topics = []
-
-        for subject, topics in progress.items():
-            for topic, status in topics.items():
-                if str(status).lower() == "completed":
-                    completed += 1
-                else:
-                    pending += 1
-                    pending_topics.append((subject, topic))
-
-        total = completed + pending
-
-        if total == 0:
-            st.info("No syllabus progress found yet. Generate a study plan first.")
-            return
-
-        # ---------------- Line Graph ----------------
-        fig, ax = plt.subplots()
-
-        ax.plot(
-            ["Start", "Current"],
-            [total, pending],
-            marker="o",
-            label="Pending Topics"
-        )
-
-        ax.plot(
-            ["Start", "Current"],
-            [0, completed],
-            marker="o",
-            label="Completed Topics"
-        )
-
-        ax.set_title("Syllabus Progress Trend")
-        ax.set_ylabel("Number of Topics")
-        ax.legend()
-
-        st.pyplot(fig)
-
-        # ---------------- Pending Topics ----------------
-        st.divider()
-        st.subheader("Pending Syllabus Topics")
-
-        if not pending_topics:
-            st.success("Excellent! All syllabus topics are completed.")
-        else:
-            st.warning(f"{pending} topics are still pending:")
-
-            for subject, topic in pending_topics[:5]:
-                st.write(f"- **{subject}** → {topic}")
-
-            if pending > 5:
-                st.caption("Focus on completing these before starting new topics.")
-
-        # ---------------- Final Message ----------------
-        st.divider()
-        st.subheader("Mentor Message")
-
-        st.write(
-            "Progress is not about speed, it is about direction. "
-            "Complete pending topics step by step — confidence will follow."
-        )
+    # --- 4. FIXED PENDING TOPICS TABLE ---
+    st.divider()
+    st.subheader(" Upcoming Tasks")
+    
+    pending_list = [t for t in schedule if t.get("Status") == "Pending"]
+    
+    if pending_list:
+        df_pending = pd.DataFrame(pending_list)
+        
+        # --- FIX: Only show columns that actually exist ---
+        available_cols = ["Date", "Topic", "Focus"]
+        existing_cols = [c for c in available_cols if c in df_pending.columns]
+        
+        st.table(df_pending[existing_cols].head(5))
+    else:
+        st.success("All tasks completed! Time for revision.")
