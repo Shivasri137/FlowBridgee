@@ -1,78 +1,100 @@
 import streamlit as st
 import json
+import os
+import re
+import urllib.parse
 from duckduckgo_search import DDGS
 
-PROGRESS_PATH = "data/user_data/progress.json"
-
+# Path must match your Exam Planner's data storage
+SCHEDULES_PATH = "data/user_data/schedules.json"
 
 def load_pending_topics():
+    """Extracts pending topics from the exam planner for searching."""
+    if not os.path.exists(SCHEDULES_PATH):
+        return []
     try:
-        with open(PROGRESS_PATH, "r") as f:
-            progress = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
+        with open(SCHEDULES_PATH, "r") as f:
+            data = json.load(f)
+            # Clean topic names (removing parentheses and unit numbers)
+            topics = [re.sub(r'\(.*?\)|Unit\s?\d+', '', t["Topic"]).strip() 
+                      for t in data if t.get("Status") != "Completed"]
+            return list(set(filter(None, topics)))
+    except Exception:
         return []
 
-    pending = []
-    for subject, topics in progress.items():
-        for topic, status in topics.items():
-            if status.lower() != "completed":
-                pending.append(f"{topic} {subject}")
+def get_links(query, platform="blog"):
+    """Fetches direct links with timeout protection and specific site targeting."""
+    if platform == "youtube":
+        final_query = f"{query} site:youtube.com"
+    elif platform == "pdf":
+        final_query = f"{query} filetype:pdf study notes"
+    else:
+        # Targets specific high-quality educational sites
+        final_query = f"{query} tutorial (site:geeksforgeeks.org OR site:w3schools.com OR site:tutorialspoint.com)"
 
-    return pending
-
-
-def search_resources(query, max_results=5):
-    results = {"Blogs": [], "YouTube": [], "PDFs": []}
-
-    with DDGS() as ddgs:
-        for r in ddgs.text(query, max_results=20):
-            link = r.get("href", "").lower()
-            title = r.get("title", "")
-            desc = r.get("body", "")
-
-            if "youtube.com" in link or "youtu.be" in link:
-                results["YouTube"].append((title, r["href"], desc))
-            elif link.endswith(".pdf"):
-                results["PDFs"].append((title, r["href"], desc))
-            else:
-                results["Blogs"].append((title, r["href"], desc))
-
-            if all(len(v) >= max_results for v in results.values()):
-                break
-
+    results = []
+    try:
+        # 'lite' backend is stable and fast
+        with DDGS(timeout=15) as ddgs:
+            resp = ddgs.text(final_query, backend="lite", max_results=5)
+            for r in resp:
+                results.append({
+                    "title": r.get("title"),
+                    "link": r.get("href"),
+                    "snippet": r.get("body")
+                })
+    except Exception:
+        return []
     return results
 
-
 def run():
+    """The main entry point called by the Dashboard."""
     st.subheader("Resource Collector Agent")
 
-    pending_topics = load_pending_topics()
-
-    if pending_topics:
-        selected_topic = st.selectbox(
-            "Your Pending Topics (from Mentor Agent)",
-            pending_topics
-        )
-    else:
-        selected_topic = ""
-
-    topic = st.text_input("Search Topic", value=selected_topic)
+    # 1. Topic Syncing
+    pending = load_pending_topics()
+    selected = st.selectbox("Select Topic from Syllabus:", pending) if pending else ""
+    query = st.text_input("Confirm Topic:", value=selected)
 
     if st.button("Find Resources"):
-        if not topic.strip():
-            st.warning("Please enter a topic.")
+        if not query:
+            st.warning("Please select a topic.")
             return
 
-        with st.spinner("Searching resources..."):
-            results = search_resources(topic)
+        # Prepare encoded URL for the fallback buttons
+        encoded_query = urllib.parse.quote(query)
 
-        for category, items in results.items():
-            st.subheader(category)
-            if not items:
-                st.info("No results found.")
-            for title, link, desc in items:
-                st.markdown(f"**{title}**")
-                st.markdown(f"[Open]({link})")
-                if desc:
-                    st.caption(desc)
-                st.markdown("---")
+        # 2. Results Tabs
+        t_blog, t_yt, t_pdf = st.tabs([" Articles", " Videos", " PDFs"])
+
+        with t_blog:
+            items = get_links(query, "blog")
+            if items:
+                display_items(items)
+            else:
+                st.info("No direct articles found.")
+                st.link_button(" Search Articles on Google", f"https://www.google.com/search?q={encoded_query}+tutorial")
+
+        with t_yt:
+            items = get_links(query, "youtube")
+            if items:
+                display_items(items)
+            else:
+                st.info("No direct videos found.")
+                st.link_button(" Search on YouTube", f"https://www.youtube.com/results?search_query={encoded_query}")
+
+        with t_pdf:
+            # PDFs are working well, but added a fallback just in case
+            items = get_links(query, "pdf")
+            display_items(items)
+
+def display_items(items):
+    """Helper to display results neatly."""
+    if not items:
+        st.info("No direct links found.")
+        return
+    for item in items:
+        st.markdown(f"#### [{item['title']}]({item['link']})")
+        st.write(item['snippet'])
+        st.caption(f"Direct Link: {item['link']}")
+        st.divider()
