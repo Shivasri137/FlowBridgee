@@ -1,4 +1,4 @@
-# Flow Bridge 🌉  
+# Flow Bridge 
 ### A Multi-Agent AI Platform for Students and Professionals
 
 Flow Bridge is an intelligent, role-based, multi-agent platform designed to bridge the gap between **academic learning** and **professional productivity**.  
@@ -144,9 +144,12 @@ streamlit run app.py
 
 ---
 
-## 👩‍💻 Author
+## 👩‍💻 Authors
 
 **Shivasri**  
+**Ram**
+**Vasu**
+**Vinay**
 Department of AI & ML  
 Nalla Malla Reddy Engineering College  
 
@@ -155,6 +158,9 @@ Nalla Malla Reddy Engineering College
 ## 📄 License
 
 This project is developed for academic and research purposes.
+
+
+
 
 
 
