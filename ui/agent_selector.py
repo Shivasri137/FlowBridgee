@@ -71,7 +71,7 @@ def run():
 
     st.markdown('<div class="main-header">Flow Bridge</div>', unsafe_allow_html=True)
     
-    st.markdown('<div class="section-title">🎓 Student Workspace</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title"> Student Workspace</div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
         agent_card("Exam Planner", "Syllabus tracking & AI Quizzes.", "exam_planner", "student")
@@ -80,7 +80,7 @@ def run():
         agent_card("Resource Collector", "Learning materials.", "resource_collector", "student")
         agent_card("Mentor Agent", "Motivation & Progress.", "mentor_agent", "student")
 
-    st.markdown('<div class="section-title">💼 Professional Suite</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title"> Professional Suite</div>', unsafe_allow_html=True)
     c3, c4 = st.columns(2)
     with c3:
         agent_card("Email Writer", "Professional drafting.", "email_writer", "professional")
