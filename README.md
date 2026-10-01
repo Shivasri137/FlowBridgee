@@ -157,7 +157,7 @@ Nalla Malla Reddy Engineering College
 
 ## 📄 License
 
-This project is developed for academic and research purposes.
+This project is developed for academic and research purposes Only.
 
 
 
